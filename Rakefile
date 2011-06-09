@@ -6,5 +6,5 @@ task :build do
 end
  
 task :release => :build do
-  system "gem push vinquery-#{Vinquery::VERSION}"
+  system "gem push vinquery-#{Vinquery::VERSION}.gem"
 end
