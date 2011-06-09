@@ -11,6 +11,7 @@ h2. How to install
 </pre>
 
 *Rubygems*
+
 <pre>
   gem install vinquery
 </pre>
@@ -21,7 +22,10 @@ Vinquery will provide you with a unique url and access_code which is needed for 
 
 <pre>
   require 'vinquery'
-  vin = Vinquery.get('1FTWX31R19EB18840', {:url => 'VINQUERY_URL', :access_code => 'ACCESS_CODE', :report_type => 'REPORT_TYPE'})
+  vin = Vinquery.get('1FTWX31R19EB18840', {
+                      :url => 'VINQUERY_URL', 
+                      :access_code => 'ACCESS_CODE', 
+                      :report_type => 'REPORT_TYPE'})
   
   vin.valid? # true
   vin.attributes[:make] # Ford
