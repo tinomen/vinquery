@@ -5,6 +5,7 @@ Bundler.setup
 
 
 require 'rspec'
+require 'webmock/rspec'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'vinquery'

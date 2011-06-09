@@ -2,12 +2,12 @@ require 'net/http'
 require 'nokogiri'
 
 class Vinquery
-  attr_reader :attributes, :vq_attrs, :vin_errors
+  attr_reader :attributes, :vq_attrs, :errors
 
-  def self.get(vin, options)
+  def self.get(vin, options={})
     request = Vinquery.new options[:url], options[:access_code], options[:report_type]
-    doc = request.get_doc vin
-    result = request.parse_doc doc
+    doc = request.fetch vin
+    result = request.parse doc
     request
   end
 
@@ -17,13 +17,13 @@ class Vinquery
     @report_type = report_type
   end
   
-  def get_doc(vin)
+  def fetch(vin)
     # initialize http get with vin
     url_s = "#{@url}?accessCode=#{@access_code}&vin=#{vin}&reportType=#{@report_type}"
     url = URI.parse(URI.escape(url_s))
     begin
       res =  Net::HTTP.get url
-    rescue
+    rescue Exception => e
       xml = Nokogiri::XML::Builder.new do |doc|
         doc.vin(:number => vin,:status => "FAILED") {
           doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our partner database isn't responding right now. Please try again later.")
@@ -34,7 +34,7 @@ class Vinquery
     @doc = Nokogiri::HTML(res)
   end
 
-  def parse_doc(doc)
+  def parse(doc)
     set_attributes doc
     set_errors_hash doc
     # VinResult.new(valid?,
@@ -58,10 +58,10 @@ class Vinquery
   end
 
   def set_errors_hash(doc)
-    @vin_errors = {}
+    @errors = {}
     @valid = doc.css('vin').first.attributes['status'].value == "SUCCESS"
 
-    @vin_errors = {doc.css('message').first.attributes['key'].value => doc.css('message').first.attributes['value'].value} unless @valid
+    @errors = {doc.css('message').first.attributes['key'].value => doc.css('message').first.attributes['value'].value} unless @valid
   end
 
   def valid?
