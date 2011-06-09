@@ -1,7 +1,12 @@
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+
 require "rake"
+require 'vinquery/version'
+
 Gem::Specification.new do |s|
   s.name        = "vinquery"
-  s.version     = "0.1.0"
+  s.version     = Vinquery::VERSION
   s.summary     = "A client for vinquery.com"
   s.description = "A client for the Vinquery.com vin decoding web service."
   s.homepage    = "http://github.com/tinomen/vinquery"
@@ -16,7 +21,10 @@ Gem::Specification.new do |s|
   s.rdoc_options     << "--title"        << s.summary <<
                         "--main"         << "README.rdoc" <<
                         "--line-numbers" << "--charset=UTF-8"
-
+  
+  s.required_rubygems_version = ">= 1.3.6"
+  s.require_path = 'lib'
+  
   # Test settings
   s.test_files = FileList["spec/**/*"].to_a
 
