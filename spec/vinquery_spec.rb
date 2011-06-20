@@ -20,8 +20,9 @@ describe Vinquery do
     it 'should return a set of vehicle attributes given a Nokogiri document' do
       doc = Nokogiri::HTML(@test_xml_data)
       @query.set_attributes(doc)
-      @query.attributes[:body_style].should == "EXTENDED CAB PICKUP 4-DR"
-      @query.attributes.count.should == 168
+      # @query.attributes.each_pair{|k,v| puts "#{k} - #{v}"}
+      @query.attributes[:body_style].should == "CREW CAB PICKUP 4-DR"
+      @query.attributes.count.should == 169
     end
 
     it 'should recover from poorly or unexpected xml document' do
@@ -31,12 +32,12 @@ describe Vinquery do
     end
   end
 
-  describe 'set errors hash' do
+  describe '#set_errors_hash' do
     it 'should give the reason for failure within an errors hash' do
       doc = Nokogiri::HTML '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\r\n<VINquery Version="1.0.0" Report_Type="BASIC" Date="2/19/2011">\r\n    <VIN Number="ABCDEFGHIJKLMNOPQ" Status="FAILED">\r\n        <Message Key="5" Value="Invalid VIN number: This VIN number contains invalid letters: I,O or Q." />\r\n    </VIN>\r\n</VINquery>'
       @query.set_errors_hash(doc)
       @query.valid?.should == false
-      @query.errors.should == {"5" => "Invalid VIN number: This VIN number contains invalid letters: I,O or Q."}
+      @query.errors.should == [{"5" => "Invalid VIN number: This VIN number contains invalid letters: I,O or Q."}]
     end
   end
 
@@ -54,7 +55,7 @@ describe Vinquery do
       doc = @query.fetch('')
       doc.css('vin').first.attributes['status'].value.should == "FAILED"
       doc.css('message').first.attributes['key'].value.should == "VinQuery unavailable"
-      doc.css('message').first.attributes['value'].value.should == "Oops, it looks like our partner database isn't responding right now. Please try again later."
+      doc.css('message').first.attributes['value'].value.should == "Oops, it looks like our VIN decoding database is down right now. Please try again later."
     end
   end
 
@@ -75,7 +76,7 @@ describe Vinquery do
       stub_request(:any, /.*fakeurl.*/).to_return(:body => @test_xml_data, :status => 200, :headers => { 'Content-Length' => @test_xml_data.length})
       query = Vinquery.get('1G1ND52F14M587843', {:url => 'http://www.fakeurl.com', :access_code => 'access_code', :report_type => 'report_type_2'})
       query.valid?.should == true
-      query.errors.should == {}
+      query.errors.empty?.should == true
       query.attributes.class.should equal(Hash)
     end
     

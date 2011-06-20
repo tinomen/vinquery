@@ -2,7 +2,7 @@ require 'net/http'
 require 'nokogiri'
 
 class Vinquery
-  attr_reader :attributes, :vq_attrs, :errors
+  attr_reader :attributes, :errors
 
   def self.get(vin, options={})
     request = Vinquery.new options[:url], options[:access_code], options[:report_type]
@@ -19,14 +19,14 @@ class Vinquery
   
   def fetch(vin)
     # initialize http get with vin
-    url_s = "#{@url}?accessCode=#{@access_code}&vin=#{vin}&reportType=#{@report_type}"
+    url_s = "#{@url}?accessCode=#{@access_code}&vin=#{vin}&reportType=#{@report_type}&reducable=FALSE"
     url = URI.parse(URI.escape(url_s))
     begin
-      res =  Net::HTTP.get url
+      res = Net::HTTP.get url
     rescue Exception => e
       xml = Nokogiri::XML::Builder.new do |doc|
         doc.vin(:number => vin,:status => "FAILED") {
-          doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our partner database isn't responding right now. Please try again later.")
+          doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our VIN decoding database is down right now. Please try again later.")
         }
       end
       res = xml.to_xml
@@ -37,15 +37,7 @@ class Vinquery
   def parse(doc)
     set_attributes doc
     set_errors_hash doc
-    # VinResult.new(valid?,
-    #                   @attributes[:make], 
-    #                   @attributes[:model], 
-    #                   @attributes[:year].to_i, 
-    #                   @attributes[:body_style], 
-    #                   @attributes[:driveline], 
-    #                   @attributes[:engine_type],
-    #                   @vin_errors.values.first,
-    #                   @attributes)
+    attributes
   end
 
   def set_attributes(doc)
@@ -58,10 +50,9 @@ class Vinquery
   end
 
   def set_errors_hash(doc)
-    @errors = {}
+    @errors = []
     @valid = doc.css('vin').first.attributes['status'].value == "SUCCESS"
-
-    @errors = {doc.css('message').first.attributes['key'].value => doc.css('message').first.attributes['value'].value} unless @valid
+    doc.css('message').each{|msg| @errors << {msg.attributes['key'].value => msg.attributes['value'].value} } unless @valid
   end
 
   def valid?
