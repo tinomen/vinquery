@@ -2,7 +2,7 @@ require 'net/http'
 require 'nokogiri'
 
 class Vinquery
-  attr_reader :attributes, :errors
+  attr_reader :attributes, :errors, :result
 
   def self.get(vin, options={})
     request = Vinquery.new options[:url], options[:access_code], options[:report_type]
@@ -18,20 +18,20 @@ class Vinquery
   end
   
   def fetch(vin)
-    # initialize http get with vin
+    # use reducable=FALSE to get additional fields like fuel_type
     url_s = "#{@url}?accessCode=#{@access_code}&vin=#{vin}&reportType=#{@report_type}&reducable=FALSE"
     url = URI.parse(URI.escape(url_s))
     begin
-      res = Net::HTTP.get url
+      @result = Net::HTTP.get url
     rescue Exception => e
       xml = Nokogiri::XML::Builder.new do |doc|
         doc.vin(:number => vin,:status => "FAILED") {
-          doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our VIN decoding database is down right now. Please try again later.")
+          doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our VIN decoder is unavailable at the moment. Please try again later.")
         }
       end
-      res = xml.to_xml
+      @result = xml.to_xml
     end
-    @doc = Nokogiri::HTML(res)
+    @doc = Nokogiri::HTML(@result)
   end
 
   def parse(doc)
@@ -41,11 +41,11 @@ class Vinquery
   end
 
   def set_attributes(doc)
-    attributes = {}
+    attributes = {:vendor_result => @result}
     doc.xpath('//vehicle[1]/item').each do |item|
       attributes[item.attributes['key'].value.downcase.gsub(/ /, '_').intern] = item.attributes['value'].value
     end
-
+    
     @attributes = attributes
   end
 
