@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vinquery (0.2.0)
+    vinquery (0.3.0)
       nokogiri (>= 1.4.4)
 
 GEM
@@ -10,18 +10,18 @@ GEM
     addressable (2.2.6)
     crack (0.1.8)
     diff-lcs (1.1.2)
-    nokogiri (1.4.4)
+    nokogiri (1.4.6)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
       rspec-expectations (~> 2.6.0)
       rspec-mocks (~> 2.6.0)
-    rspec-core (2.6.3)
+    rspec-core (2.6.4)
     rspec-expectations (2.6.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.6.0)
-    vin_exploder (0.2.0)
+    vin_exploder (0.3.0)
     webmock (1.6.4)
-      addressable (~> 2.2, > 2.2.5)
+      addressable (> 2.2.5, ~> 2.2)
       crack (>= 0.1.7)
 
 PLATFORMS

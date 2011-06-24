@@ -22,7 +22,7 @@ describe Vinquery do
       @query.set_attributes(doc)
       # @query.attributes.each_pair{|k,v| puts "#{k} - #{v}"}
       @query.attributes[:body_style].should == "CREW CAB PICKUP 4-DR"
-      @query.attributes.count.should == 169
+      @query.attributes.count.should == 170
     end
 
     it 'should recover from poorly or unexpected xml document' do
@@ -55,7 +55,7 @@ describe Vinquery do
       doc = @query.fetch('')
       doc.css('vin').first.attributes['status'].value.should == "FAILED"
       doc.css('message').first.attributes['key'].value.should == "VinQuery unavailable"
-      doc.css('message').first.attributes['value'].value.should == "Oops, it looks like our VIN decoding database is down right now. Please try again later."
+      doc.css('message').first.attributes['value'].value.should == "Oops, it looks like our VIN decoder is unavailable at the moment. Please try again later."
     end
   end
 

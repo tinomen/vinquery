@@ -41,11 +41,11 @@ class Vinquery
   end
 
   def set_attributes(doc)
-    attributes = {:vendor_result => @result}
+    attributes = {}
     doc.xpath('//vehicle[1]/item').each do |item|
       attributes[item.attributes['key'].value.downcase.gsub(/ /, '_').intern] = item.attributes['value'].value
     end
-    
+    attributes[:vendor_result] = @result if attributes.size > 0
     @attributes = attributes
   end
 
