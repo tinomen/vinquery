@@ -25,7 +25,7 @@ describe Vinquery do
       @query.attributes.count.should == 170
     end
 
-    it 'should recover from poorly or unexpected xml document' do
+    it 'should recover from poorly formatted or unexpected xml document' do
       xml_s = '<?xml version="1.0"?>\\n<blah status="FAILED" number="vin"\\n'
       doc = Nokogiri::HTML(xml_s)
       @query.set_attributes(doc).should == {}

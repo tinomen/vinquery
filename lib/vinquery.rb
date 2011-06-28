@@ -5,7 +5,7 @@ class Vinquery
   attr_reader :attributes, :errors, :result
 
   def self.get(vin, options={})
-    request = Vinquery.new options[:url], options[:access_code], options[:report_type]
+    request = Vinquery.new(options[:url], options[:access_code], options[:report_type])
     doc = request.fetch vin
     result = request.parse doc
     request
@@ -19,8 +19,9 @@ class Vinquery
   
   def fetch(vin)
     # use reducable=FALSE to get additional fields like fuel_type
-    url_s = "#{@url}?accessCode=#{@access_code}&vin=#{vin}&reportType=#{@report_type}&reducable=FALSE"
-    url = URI.parse(URI.escape(url_s))
+    @uri ||= "#{@url}?accessCode=#{@access_code}&reportType=#{@report_type}&reducable=FALSE"
+    url_s = @uri + "&vin=#{vin}"
+    url = URI.parse(url_s)
     begin
       @result = Net::HTTP.get url
     rescue Exception => e
@@ -43,9 +44,12 @@ class Vinquery
   def set_attributes(doc)
     attributes = {}
     doc.xpath('//vehicle[1]/item').each do |item|
-      attributes[item.attributes['key'].value.downcase.gsub(/ /, '_').intern] = item.attributes['value'].value
+      attributes[item.attributes['key'].value.downcase.gsub('.', '').gsub(/ /, '_').to_sym] = item.attributes['value'].value
     end
-    attributes[:vendor_result] = @result if attributes.size > 0
+    if attributes.size > 0
+      attributes[:vin] = doc.css('vin').first.attributes['number'].value
+      attributes[:vendor_result] = doc.to_xml 
+    end
     @attributes = attributes
   end
 
