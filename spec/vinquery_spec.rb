@@ -22,7 +22,7 @@ describe Vinquery do
       @query.set_attributes(doc)
       # @query.attributes.each_pair{|k,v| puts "#{k} - #{v}"}
       @query.attributes[:body_style].should == "CREW CAB PICKUP 4-DR"
-      @query.attributes.count.should == 170
+      @query.attributes.count.should == 171
     end
 
     it 'should recover from poorly formatted or unexpected xml document' do
@@ -78,13 +78,15 @@ describe Vinquery do
       query.valid?.should == true
       query.errors.empty?.should == true
       query.attributes.class.should equal(Hash)
+      query.attributes[:make].should == 'Dodge'
     end
     
-    it 'should return an errors hash with an invalid vin number' do
+    it 'should return an errors array with an invalid vin number' do
       res = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\r\n<VINquery Version="1.0.0" Report_Type="BASIC" Date="2/19/2011">\r\n    <VIN Number="ABCDEFGHIJKLMNOPQ" Status="FAILED">\r\n        <Message Key="5" Value="Invalid VIN number: This VIN number contains invalid letters: I,O or Q." />\r\n    </VIN>\r\n</VINquery>'
       stub_request(:any, /.*invalidvin.*/).to_return(:body => res, :status => 200, :headers => { 'Content-Length' => res.length})
       results = Vinquery.get('BADVIN', {:url => 'http://www.invalidvin.com', :access_code => 'access_code', :report_type => 'report_type_2'})
       results.valid?.should == false
+      results.errors.class.should == Array
     end
   end
 
