@@ -48,6 +48,7 @@ class Vinquery
     end
     if attributes.size > 0
       attributes[:vin] = doc.css('vin').first.attributes['number'].value
+      attributes[:vin_key] = make_vin_key(attributes[:vin])
       attributes[:vendor_result] = doc.to_xml 
     end
     @attributes = attributes
@@ -61,6 +62,11 @@ class Vinquery
 
   def valid?
     @valid
+  end
+  
+  def make_vin_key(vin)
+    key = vin.slice(0,8)
+    key << vin.slice(9,2)
   end
 
 end

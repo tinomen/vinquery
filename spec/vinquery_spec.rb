@@ -22,7 +22,7 @@ describe Vinquery do
       @query.set_attributes(doc)
       # @query.attributes.each_pair{|k,v| puts "#{k} - #{v}"}
       @query.attributes[:body_style].should == "CREW CAB PICKUP 4-DR"
-      @query.attributes.count.should == 171
+      @query.attributes[:vin_key].should == "3D7LU38C3G"
     end
 
     it 'should recover from poorly formatted or unexpected xml document' do
