@@ -47,7 +47,7 @@ class Vinquery
       attributes[item.attributes['key'].value.downcase.gsub('.', '').gsub(/ /, '_').to_sym] = item.attributes['value'].value
     end
     if attributes.size > 0
-      attributes[:vin] = doc.css('vin').first.attributes['number'].value
+      # attributes[:vin] = doc.css('vin').first.attributes['number'].value
       attributes[:vin_key] = make_vin_key(attributes[:vin])
       attributes[:vendor_result] = doc.to_xml 
     end
