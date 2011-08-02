@@ -19,7 +19,7 @@ class Vinquery
   
   def fetch(vin)
     # use reducable=FALSE to get additional fields like fuel_type
-    @uri ||= "#{@url}?accessCode=#{@access_code}&reportType=#{@report_type}&reducable=FALSE"
+    @uri ||= "#{@url}?accessCode=#{@access_code}&reportType=#{@report_type}&reducable=FALSE&vt=true&gvwr=true"
     url_s = @uri + "&vin=#{vin}"
     url = URI.parse(url_s)
     begin
