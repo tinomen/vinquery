@@ -1,6 +1,6 @@
 require 'net/http'
 require 'nokogiri'
-require 'Logger'
+require 'logger'
 
 class Vinquery
   attr_reader :attributes, :errors, :result
@@ -12,10 +12,11 @@ class Vinquery
     request
   end
 
-  def initialize(url, access_code, report_type, log = Logger.new(nil))
+  def initialize(url, access_code, report_type, log = nil)
     @url = url
     @access_code = access_code
     @report_type = report_type
+    log ||= Logger.new(nil)
     @log = log
   end
   
@@ -67,7 +68,7 @@ class Vinquery
     @errors = []
     @valid = doc.css('vin').first.attributes['status'].value == "SUCCESS"
     doc.css('message').each{|msg| @errors << {msg.attributes['key'].value => msg.attributes['value'].value} } unless valid?
-    @errors.each{|msg| @log.error{"Vinquery#set_errors_hash - error: #{msg.to_s}"}} unless @errors.empty
+    @errors.each{|msg| @log.error{"Vinquery#set_errors_hash - error: #{msg.to_s}"}} unless @errors.empty?
   end
 
   def valid?
