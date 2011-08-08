@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vinquery (0.4.0)
+    vinquery (0.4.1)
       nokogiri (>= 1.4.4)
 
 GEM

@@ -59,7 +59,9 @@ class Vinquery
     if attributes.size > 0
       vin = doc.css('vin').first.attributes['number'].value
       attributes[:vin_key] = make_vin_key(vin)
-      attributes[:vendor_result] = doc.to_xml 
+      attributes[:vendor_result] = doc.to_xml
+      attributes[:number_of_cylinders] = attributes[:engine_type].upcase.match(/ [LV](\d{1,2}) /) ? $1 : nil
+      attributes[:has_turbo] = attributes[:engine_type].upcase.match(/ ([TURBO|SUPERCHARGED]) /) ? true : false
     end
     @attributes = attributes
   end
