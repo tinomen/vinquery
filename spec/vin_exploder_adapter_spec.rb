@@ -31,9 +31,11 @@ describe VinqueryAdapter do
     stub_request(:any, /.*invalidvin.*/).to_return(:body => res, :status => 200, :headers => { 'Content-Length' => res.length})
     query = Vinquery.new('http://www.invalidvin.com', 'access_code', 'report_type_2')
     Vinquery.should_receive(:new){ query }
-    hash = @adapter.explode('BAD_VIN')
-    hash[:errors].size.should == 1
-    hash[:errors].first['5'].should == 'Invalid VIN number: This VIN number contains invalid letters: I,O or Q.'
+    
+    expect { @adapter.explode('BAD_VIN') }.to raise_error(VinqueryException, /Invalid VIN number/)
+
+    # hash[:errors].size.should == 1
+    # hash[:errors].first['5'].should == 'Invalid VIN number: This VIN number contains invalid letters: I,O or Q.'
   end
   
 end

@@ -2,6 +2,14 @@ require 'net/http'
 require 'nokogiri'
 require 'logger'
 
+class VinqueryException < StandardError 
+  attr_accessor :original_exception
+  def initialize(msg=nil, exception=nil)
+    super(msg)
+    original_exception = exception
+  end
+end
+
 class Vinquery
   attr_reader :attributes, :errors, :result
 
@@ -31,17 +39,18 @@ class Vinquery
     begin
       @result = Net::HTTP.get url
       @log.debug{"Vinquery#fetch - result: #{@result}"}
+      Nokogiri::HTML(@result)
     rescue Exception => e
-      @log.error{"ERROR - #{e.message}"}
-      @log.error{"ERROR - #{e.backtrace[0]}"}
-      xml = Nokogiri::XML::Builder.new do |doc|
-        doc.vin(:number => vin,:status => "FAILED") {
-          doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our VIN decoder is unavailable at the moment. Please try again later.")
-        }
-      end
-      @result = xml.to_xml
+      # @log.error{"ERROR - #{e.message}"}
+      # @log.error{"ERROR - #{e.backtrace[0]}"}
+      # xml = Nokogiri::XML::Builder.new do |doc|
+      #   doc.vin(:number => vin,:status => "FAILED") {
+      #     doc.message(:Key => "VinQuery unavailable", :Value => "Oops, it looks like our VIN decoder is unavailable at the moment. Please try again later.")
+      #   }
+      # end
+      raise VinqueryException.new(e.message, e)
+      # @result = xml.to_xml
     end
-    @doc = Nokogiri::HTML(@result)
   end
 
   def parse(doc)
@@ -70,7 +79,8 @@ class Vinquery
     @errors = []
     @valid = doc.css('vin').first.attributes['status'].value == "SUCCESS"
     doc.css('message').each{|msg| @errors << {msg.attributes['key'].value => msg.attributes['value'].value} } unless valid?
-    @errors.each{|msg| @log.error{"Vinquery#set_errors_hash - error: #{msg.to_s}"}} unless @errors.empty?
+    # @errors.each{|msg| @log.error{"Vinquery#set_errors_hash - error: #{msg.to_s}"}} unless @errors.empty?
+    raise VinqueryException.new(@errors.map{|msg| "#{msg.keys[0]}: #{msg.values[0]}"}.join("\n")) unless @errors.empty?
   end
 
   def valid?

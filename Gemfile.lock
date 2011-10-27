@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vinquery (0.4.1)
+    vinquery (0.4.2)
       nokogiri (>= 1.4.4)
 
 GEM
@@ -21,7 +21,7 @@ GEM
     rspec-mocks (2.6.0)
     vin_exploder (0.4.3)
     webmock (1.6.4)
-      addressable (> 2.2.5, ~> 2.2)
+      addressable (~> 2.2, > 2.2.5)
       crack (>= 0.1.7)
 
 PLATFORMS
