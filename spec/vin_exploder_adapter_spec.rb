@@ -9,7 +9,7 @@ describe VinqueryAdapter do
 
   before(:each) do
     
-    @query = Vinquery.new 'http://www.vinlookupservice.com', 'access_code', 'report_type_2'
+    @query = Vinquery.new 'valid_vin', 'http://www.vinlookupservice.com', 'access_code', 'report_type_2'
     @adapter = VinqueryAdapter.new({})
     @test_xml_data ||= File.new("#{File.dirname(__FILE__)}/vinquery_test.xml", "r").read
     stub_request(:any, /.*vinlookupservice.*/).to_return(:body => @test_xml_data, :status => 200, :headers => { 'Content-Length' => @test_xml_data.length})
@@ -26,10 +26,10 @@ describe VinqueryAdapter do
     hash[:errors].empty?.should == true
   end
   
-  it 'should include an errors hash with an invalid vin number' do
+  it 'should raise an error with an invalid vin number' do
     res = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\r\n<VINquery Version="1.0.0" Report_Type="BASIC" Date="2/19/2011">\r\n    <VIN Number="ABCDEFGHIJKLMNOPQ" Status="FAILED">\r\n        <Message Key="5" Value="Invalid VIN number: This VIN number contains invalid letters: I,O or Q." />\r\n    </VIN>\r\n</VINquery>'
     stub_request(:any, /.*invalidvin.*/).to_return(:body => res, :status => 200, :headers => { 'Content-Length' => res.length})
-    query = Vinquery.new('http://www.invalidvin.com', 'access_code', 'report_type_2')
+    query = Vinquery.new('BAD_VIN', 'http://www.invalidvin.com', 'access_code', 'report_type_2')
     Vinquery.should_receive(:new){ query }
     
     expect { @adapter.explode('BAD_VIN') }.to raise_error(VinqueryException, /Invalid VIN number/)
