@@ -1,3 +1,5 @@
 .rvmrc
 *.gem
 coverage
+.DS_Store
+.idea
