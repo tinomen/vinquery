@@ -33,5 +33,3 @@ vin = Vinquery.get('1FTWX31R19EB18840', {
 vin.valid? # true
 vin.attributes[:make] # Ford
 ```
-
-[![Sponsor](https://app.codesponsor.io/embed/gfv4BcbtkMGmAidCd8ReeHRM/tinomen/vinquery.svg)](https://app.codesponsor.io/link/gfv4BcbtkMGmAidCd8ReeHRM/tinomen/vinquery)
